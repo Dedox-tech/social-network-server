@@ -1,9 +1,10 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using SocialNetworkServer.Entities;
 
 namespace SocialNetworkServer.Data
 {
-    public class ApplicationDatabaseContext : DbContext
+    public class ApplicationDatabaseContext : IdentityDbContext
     {
         public ApplicationDatabaseContext(DbContextOptions options) : base(options)
         {

@@ -1,3 +1,5 @@
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using SocialNetworkServer.Data;
 
@@ -12,6 +14,12 @@ var connectionString = builder.Configuration.GetConnectionString("postgresConnec
 
 builder.Services.AddDbContext<ApplicationDatabaseContext>(options => 
     options.UseNpgsql(connectionString));
+
+// Configuring identity auth
+builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer();
+builder.Services.AddIdentity<IdentityUser, IdentityRole>()
+    .AddEntityFrameworkStores<ApplicationDatabaseContext>()
+    .AddDefaultTokenProviders();
 
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();

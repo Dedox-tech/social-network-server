@@ -5,9 +5,12 @@ namespace SocialNetworkServer.Entities
     public class Post
     {
         public int Id { get; set; }
-
         [Required]
-        public string Text { get; set; }
-
+        public string Title { get; set; }
+        [Required]
+        public string Description { get; set; }
+        [Required]
+        public DateTime CreationDate { get; set; }
+        
     }
 }
