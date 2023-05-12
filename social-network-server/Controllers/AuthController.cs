@@ -5,6 +5,7 @@ using Microsoft.EntityFrameworkCore;
 using SocialNetworkServer.Data;
 using SocialNetworkServer.DTO;
 using SocialNetworkServer.Entities;
+using System.Net;
 
 namespace SocialNetworkServer.Controllers
 {
@@ -43,10 +44,26 @@ namespace SocialNetworkServer.Controllers
 
             if (userCreationResult.Succeeded)
             {
-                return Ok("The user was created successfully");
+                var successResponse = new ResponseDTO()
+                {
+                    Code = HttpStatusCode.OK,
+                    Message = "The user was created successfully",
+                };
+                    
+                return Ok(successResponse);
             }
 
-            return BadRequest(userCreationResult.Errors);
+            // Mapping the errors
+            var customErrorList = new List<object>();
+            userCreationResult.Errors.ToList().ForEach(error => customErrorList.Add(error));
+
+            var failureResponse = new ResponseDTO() { 
+                Code = HttpStatusCode.BadRequest,
+                Message = "An undeterminated error ocurred during the user creation process",
+                Errors = customErrorList
+            };
+
+            return BadRequest(failureResponse);
         }
 
     }
