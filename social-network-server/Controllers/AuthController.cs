@@ -5,6 +5,7 @@ using Microsoft.EntityFrameworkCore;
 using SocialNetworkServer.Data;
 using SocialNetworkServer.DTO;
 using SocialNetworkServer.Entities;
+using SocialNetworkServer.Helpers;
 using System.Net;
 
 namespace SocialNetworkServer.Controllers
@@ -16,12 +17,14 @@ namespace SocialNetworkServer.Controllers
         private readonly ApplicationDatabaseContext context;
         private readonly UserManager<IdentityUser> userManager;
         private readonly SignInManager<IdentityUser> signInManager;
+        private readonly IConfiguration configuration;
 
-        public AuthController(ApplicationDatabaseContext context, UserManager<IdentityUser> userManager, SignInManager<IdentityUser> signInManager)
+        public AuthController(ApplicationDatabaseContext context, UserManager<IdentityUser> userManager, SignInManager<IdentityUser> signInManager, IConfiguration configuration)
         {
             this.context = context;
             this.userManager = userManager;
             this.signInManager = signInManager;
+            this.configuration = configuration;
         }
 
         [HttpGet]
@@ -64,6 +67,33 @@ namespace SocialNetworkServer.Controllers
             };
 
             return BadRequest(failureResponse);
+        }
+
+        [HttpPost("login")]
+        public async Task<IActionResult> LogIn([FromBody] UserLoginDTO userLoginDTO)
+        {
+            var loginResult = await signInManager.PasswordSignInAsync(userLoginDTO.UserName, userLoginDTO.Password, false, false);
+
+            if (loginResult.Succeeded)
+            {
+                var successResponse = new ResponseDTO<TokenInformationDTO>()
+                {
+                    Code = HttpStatusCode.OK,
+                    Message = "User had log in successfully",
+                    Data = JwtManager.BuildToken(userLoginDTO, configuration["JWTKey"], 1)
+                };
+
+                return Ok(successResponse);
+            }
+
+            var failureResponse = new ResponseDTO()
+            {
+                Code = HttpStatusCode.BadRequest,
+                Message = "Please check your credentials and try again",
+            };
+
+            return BadRequest(failureResponse);
+
         }
 
     }
